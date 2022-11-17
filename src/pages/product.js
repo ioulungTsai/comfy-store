@@ -24,12 +24,32 @@ let productID
 // show product when page loads
 window.addEventListener("DOMContentLoaded", async function () {
   const urlID = window.location.search
-  // const urlID = "?id=hello"
+
   try {
     const response = await fetch(`${singleProductUrl}${urlID}`)
     if (response.status >= 200 && response.status <= 299) {
       const product = await response.json()
       console.log(product)
+      // grab data
+      const { id, fields } = product
+      productID = id
+      const { name, company, price, colors, description } = fields
+      const image = fields.image[0].thumbnails.large.url
+
+      // set values
+      document.title = `${name.toUpperCase()} | Comfy`
+      pageTitleDOM.textContent = `home / ${name}`
+      imgDOM.src = image
+      titleDOM.textContent = name
+      companyDOM.textContent = `by ${company.toUpperCase()}`
+      priceDOM.textContent = formatPrice(price)
+      descDOM.textContent = description
+      colors.forEach((color) => {
+        const span = document.createElement("span")
+        span.classList.add("product-color")
+        span.style.backgroundColor = `${color}`
+        colorsDOM.appendChild(span)
+      })
     } else {
       console.log(response.status, response.statusText)
       centerDOM.innerHTML = `
@@ -44,4 +64,8 @@ window.addEventListener("DOMContentLoaded", async function () {
   }
 
   loading.style.display = "none"
+})
+
+cartBtn.addEventListener("click", function () {
+  addToCart(productID)
 })
